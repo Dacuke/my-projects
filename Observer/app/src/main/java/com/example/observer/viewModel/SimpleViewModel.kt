@@ -1,4 +1,4 @@
-package com.example.observer
+package com.example.observer.viewModel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

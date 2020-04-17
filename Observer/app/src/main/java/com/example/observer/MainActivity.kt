@@ -5,18 +5,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProviders
 import com.example.observer.databinding.ActivityMainBinding
+import com.example.observer.lifecycle.*
+import com.example.observer.viewModel.SimpleViewModel
 
-class MainActivity : AppCompatActivity(), LifecycleOwner {
+class MainActivity : AppCompatActivity(),
+    LifecycleOwner {
     val mainViewModel by lazy { ViewModelProviders.of(this).get(SimpleViewModel::class.java) }
     override var observers: MutableList<Observer> = mutableListOf()
     private var observer = MyClass()
     init {
-        this.addNewObserver(observer)
+        addNewObserver(observer)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        val mainViewModel = ViewModelProviders.of(this).get(SimpleViewModel::class.java)
         val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.lifecycleOwner = this
         binding.viewModel = mainViewModel
@@ -49,26 +51,31 @@ class MainActivity : AppCompatActivity(), LifecycleOwner {
 
     override fun onStart() {
         mainViewModel.calledOnStart()
+        setState("onStart")
         super.onStart()
     }
 
     override fun onPause() {
         mainViewModel.calledOnPause()
+        setState("onPause")
         super.onPause()
     }
 
     override fun onStop() {
         mainViewModel.calledOnStop()
+        setState("onStop")
         super.onStop()
     }
 
     override fun onDestroy() {
         mainViewModel.calledOnDestroy()
+        setState("onDestroy")
         super.onDestroy()
     }
 
     override fun onRestart() {
         mainViewModel.calledOnRestart()
+        setState("onRestart")
         super.onRestart()
     }
 }

@@ -3,8 +3,8 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimary">@android:color/holo_green_light</item>
+        <item name="colorPrimaryDark">@android:color/holo_green_dark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
@@ -14,6 +14,7 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:textSize">24sp</item>
         <item name="android:color">#000000</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
         <item name="android:gravity">center</item>
     </style>
 
@@ -23,6 +24,7 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:textSize">24sp</item>
         <item name="android:color">#000000</item>
+        <item name="android:fontFamily">@font/roboto_medium</item>
         <item name="android:gravity">center</item>
     </style>
 

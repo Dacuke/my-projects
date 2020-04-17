@@ -1,7 +1,6 @@
-package com.example.observer
+package com.example.observer.lifecycle
 
 import android.util.Log
-import com.example.observer.Observer
 
 class MyClass : Observer {
     override fun notify(value: String) {

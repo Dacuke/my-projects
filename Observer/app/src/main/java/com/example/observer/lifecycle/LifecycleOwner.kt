@@ -1,6 +1,4 @@
-package com.example.observer
-
-import android.util.Log
+package com.example.observer.lifecycle
 
 interface LifecycleOwner {
     var observers: MutableList<Observer>
@@ -11,7 +9,6 @@ interface LifecycleOwner {
     }
 
     fun addNewObserver(newObserver: Observer) {
-        Log.i("LifecycleOwner", "Added observer")
         observers.add(newObserver)
     }
 }

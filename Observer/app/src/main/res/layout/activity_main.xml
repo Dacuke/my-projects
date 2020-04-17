@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="viewModel" type="com.example.observer.SimpleViewModel" />
+        <variable name="viewModel" type="com.example.observer.viewModel.SimpleViewModel" />
     </data>
 
     <LinearLayout
