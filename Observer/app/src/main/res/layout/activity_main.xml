@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="viewModel" type="com.example.observer.SimpleViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        tools:context=".MainActivity">
+
+        <LinearLayout style="@style/MyLayout">
+
+            <TextView
+                android:id="@+id/onCreateText"
+                style="@style/MyText"
+                android:text="@string/onCreateText" />
+
+            <TextView
+                android:id="@+id/myOnCreateID"
+                style="@style/MyNumbers"
+                android:text="@{Integer.toString(viewModel.myOnCreate) }" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/MyLayout">
+
+            <TextView
+                android:id="@+id/onStartText"
+                style="@style/MyText"
+                android:text="@string/onStartText" />
+
+            <TextView
+                android:id="@+id/myOnStartID"
+                style="@style/MyNumbers"
+                android:text="@{Integer.toString(viewModel.myOnStart)}" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/MyLayout">
+
+            <TextView
+                android:id="@+id/onPauseText"
+                style="@style/MyText"
+                android:text="@string/onPauseText" />
+
+            <TextView
+                android:id="@+id/myOnPauseID"
+                style="@style/MyNumbers"
+                android:text="@{Integer.toString(viewModel.myOnPause)}" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/MyLayout">
+
+            <TextView
+                android:id="@+id/onStopText"
+                style="@style/MyText"
+                android:text="@string/onStopText" />
+
+            <TextView
+                android:id="@+id/myOnStopID"
+                style="@style/MyNumbers"
+                android:text="@{Integer.toString(viewModel.myOnStop)}" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/MyLayout">
+
+            <TextView
+                android:id="@+id/onDestroyText"
+                style="@style/MyText"
+                android:text="@string/onDestroyText" />
+
+            <TextView
+                android:id="@+id/myOnDestroyID"
+                style="@style/MyNumbers"
+                android:text="@{Integer.toString(viewModel.myOnDestroy)}" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/MyLayout">
+
+            <TextView
+                android:id="@+id/onRestartText"
+                style="@style/MyText"
+                android:text="@string/onRestartText" />
+
+            <TextView
+                android:id="@+id/myOnRestartID"
+                style="@style/MyNumbers"
+                android:text="@{Integer.toString(viewModel.myOnRestart)}" />
+        </LinearLayout>
+
+    </LinearLayout>
+</layout>
+

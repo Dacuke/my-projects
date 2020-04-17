@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Observer</string>
+    <string name="onCreateText">onCreate called</string>
+    <string name="onStartText">onStart called</string>
+    <string name="onPauseText">onPause called</string>
+    <string name="onStopText">onStop called</string>
+    <string name="onDestroyText">onDestroy called</string>
+    <string name="onRestartText">onRestart called</string>
+</resources>
