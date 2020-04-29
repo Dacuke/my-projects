@@ -51,7 +51,7 @@
             android:layout_marginEnd="20dp"
             android:ems="10"
             android:hint="Age"
-            android:inputType="textPersonName"
+            android:inputType="number"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/surname" />
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="ADD"
-            android:onClick="@{() -> personNameViewModel.onAdd()}"
+
             app:layout_constraintEnd_toStartOf="@+id/button_delete"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -78,6 +78,10 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/button_add"
             app:layout_constraintTop_toTopOf="@+id/button_add" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
         <ScrollView
             android:layout_width="409dp"
@@ -95,7 +99,8 @@
                 android:id="@+id/textView3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@{personNameViewModel.personToString}" />
+                android:text="@{personNameViewModel.personToString}"
+                android:textAlignment="center" />
         </ScrollView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

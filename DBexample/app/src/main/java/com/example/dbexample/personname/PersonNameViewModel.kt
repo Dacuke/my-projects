@@ -23,14 +23,15 @@ class PersonNameViewModel(
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
 //    private var people = MutableLiveData<Person?>()
-    @SuppressLint("ResourceType")
-    private val personName = application.resources.getString(R.id.name)
-    @SuppressLint("ResourceType")
-    private val personSurname = application.resources.getString(R.id.surname)
-    @SuppressLint("ResourceType")
-    private val personAge = application.resources.getInteger(R.id.age)
-
-    private val myPerson: Person = Person(personName, personSurname, personAge)
+//    @SuppressLint("ResourceType")
+//    private val personName = application.resources.getString(R.id.name)
+//    @SuppressLint("ResourceType")
+//    private val personSurname = application.resources.getString(R.id.surname)
+//    @SuppressLint("ResourceType")
+//    private val personAge = application.resources.getInteger(R.id.age)
+//
+//    private val myPerson: Person = Person(personName, personSurname, personAge)
+//    private val myPerson: Person = Person("personName", "personSurname", 10)
 
     private val persons = database.getAllPerson()
 
@@ -55,7 +56,7 @@ class PersonNameViewModel(
         }
     }
 
-    fun onAdd() {
+    fun onAdd(myPerson: Person) {
         uiScope.launch {
             insert(myPerson)
         }
@@ -71,9 +72,9 @@ class PersonNameViewModel(
         sb.apply {
 //            append(resources.getString(R.string.title))
             person.forEach {
-                append("\t${it.name} ")
-                append("\t${it.surname} ")
-                append("\t${it.age}<br>")
+                append("${it.name} ")
+                append("${it.surname} ")
+                append("${it.age}<br>")
                 append("<br>")
             }
         }

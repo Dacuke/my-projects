@@ -8,13 +8,12 @@ import com.example.observer.databinding.ActivityMainBinding
 import com.example.observer.lifecycle.*
 import com.example.observer.viewModel.SimpleViewModel
 
-class MainActivity : AppCompatActivity(),
-    LifecycleOwner {
-    val mainViewModel by lazy { ViewModelProviders.of(this).get(SimpleViewModel::class.java) }
+class MainActivity : AppCompatActivity(), LifecycleOwner {
+    private val mainViewModel by lazy { ViewModelProviders.of(this).get(SimpleViewModel::class.java) }
     override var observers: MutableList<Observer> = mutableListOf()
     private var observer = MyClass()
     init {
-        addNewObserver(observer)
+        observers.add(observer)
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,60 +21,60 @@ class MainActivity : AppCompatActivity(),
         val binding: ActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.lifecycleOwner = this
         binding.viewModel = mainViewModel
-        setState("onCreate")
+        changeStatus("onCreate")
         mainViewModel.calledOnCreate()
 
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.run {
-            putString("ONCREATE", mainViewModel._myOnCreate.value.toString())
-            putString("ONSTART", mainViewModel._myOnStart.value.toString())
-            putString("ONPAUSE", mainViewModel._myOnPause.value.toString())
-            putString("ONSTOP", mainViewModel._myOnStop.value.toString())
-            putString("ONDESTROY", mainViewModel._myOnDestroy.value.toString())
-            putString("ONRESTART", mainViewModel._myOnRestart.value.toString())
+            putInt("ONCREATE", mainViewModel._myOnCreate.value!!)
+            putInt("ONSTART", mainViewModel._myOnStart.value!!)
+            putInt("ONPAUSE", mainViewModel._myOnPause.value!!)
+            putInt("ONSTOP", mainViewModel._myOnStop.value!!)
+            putInt("ONDESTROY", mainViewModel._myOnDestroy.value!!)
+            putInt("ONRESTART", mainViewModel._myOnRestart.value!!)
         }
         super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        mainViewModel._myOnCreate.value = savedInstanceState.getString("ONCREATE")!!.toInt()
-        mainViewModel._myOnStart.value = savedInstanceState.getString("ONSTART")!!.toInt()
-        mainViewModel._myOnPause.value = savedInstanceState.getString("ONPAUSE")!!.toInt()
-        mainViewModel._myOnStop.value = savedInstanceState.getString("ONSTOP")!!.toInt()
-        mainViewModel._myOnDestroy.value = savedInstanceState.getString("ONDESTROY")!!.toInt()
-        mainViewModel._myOnRestart.value = savedInstanceState.getString("ONRESTART")!!.toInt()
+        mainViewModel._myOnCreate.value = savedInstanceState.getInt("ONCREATE")
+        mainViewModel._myOnStart.value = savedInstanceState.getInt("ONSTART")
+        mainViewModel._myOnPause.value = savedInstanceState.getInt("ONPAUSE")
+        mainViewModel._myOnStop.value = savedInstanceState.getInt("ONSTOP")
+        mainViewModel._myOnDestroy.value = savedInstanceState.getInt("ONDESTROY")
+        mainViewModel._myOnRestart.value = savedInstanceState.getInt("ONRESTART")
     }
 
     override fun onStart() {
         mainViewModel.calledOnStart()
-        setState("onStart")
+        changeStatus("onStart")
         super.onStart()
     }
 
     override fun onPause() {
         mainViewModel.calledOnPause()
-        setState("onPause")
+        changeStatus("onPause")
         super.onPause()
     }
 
     override fun onStop() {
         mainViewModel.calledOnStop()
-        setState("onStop")
+        changeStatus("onStop")
         super.onStop()
     }
 
     override fun onDestroy() {
         mainViewModel.calledOnDestroy()
-        setState("onDestroy")
+        changeStatus("onDestroy")
         super.onDestroy()
     }
 
     override fun onRestart() {
         mainViewModel.calledOnRestart()
-        setState("onRestart")
+        changeStatus("onRestart")
         super.onRestart()
     }
 }
