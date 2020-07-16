@@ -9,7 +9,7 @@ import org.webrtc.RtpReceiver
 
 internal open class CustomPeerConnectionObserver(logTag: String) :
     Observer {
-    private var logTag: String?
+    private var logTag: String? = this.javaClass.canonicalName
     override fun onSignalingChange(signalingState: SignalingState) {
         Log.d(
             logTag,
@@ -82,7 +82,6 @@ internal open class CustomPeerConnectionObserver(logTag: String) :
     }
 
     init {
-        this.logTag = this.javaClass.canonicalName
         this.logTag = this.logTag + " " + logTag
     }
 }

@@ -5,7 +5,7 @@ import org.webrtc.SdpObserver
 import org.webrtc.SessionDescription
 
 internal open class CustomSdpObserver(logTag: String) : SdpObserver {
-    private var tag: String?
+    private var tag: String? = this.javaClass.canonicalName
     override fun onCreateSuccess(sessionDescription: SessionDescription) {
         Log.d(
             tag,
@@ -26,7 +26,6 @@ internal open class CustomSdpObserver(logTag: String) : SdpObserver {
     }
 
     init {
-        tag = this.javaClass.canonicalName
-        tag = tag + " " + logTag
+        tag = "$tag $logTag"
     }
 }

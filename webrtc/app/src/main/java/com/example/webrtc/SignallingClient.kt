@@ -21,11 +21,11 @@ import javax.net.ssl.X509TrustManager
 
 internal class SignallingClient {
     private var roomName: String? = null
-    private var socket: Socket? = null
+    private lateinit var socket: Socket
     var isChannelReady = false
     var isInitiator = false
     var isStarted = false
-    private var callback: SignalingInterface? = null
+    private lateinit var callback: SignalingInterface
 
     //This piece of code should not go into production!!
     //This will help in cases where the node server is running in non-https server and you want to ignore the warnings
@@ -36,12 +36,14 @@ internal class SignallingClient {
                 return arrayOf()
             }
 
+            @SuppressLint("TrustAllX509TrustManager")
             override fun checkClientTrusted(
                 chain: Array<X509Certificate>,
                 authType: String
             ) {
             }
 
+            @SuppressLint("TrustAllX509TrustManager")
             override fun checkServerTrusted(
                 chain: Array<X509Certificate>,
                 authType: String
@@ -49,103 +51,91 @@ internal class SignallingClient {
             }
         })
 
-    fun init(signalingInterface: MainActivity) {
+    fun init(signalingInterface: SignalingInterface) {
         callback = signalingInterface
         try {
             val sslcontext = SSLContext.getInstance("TLS")
             sslcontext.init(null, trustAllCerts, null)
-            IO.setDefaultHostnameVerifier { hostname: String?, session: SSLSession? -> true }
+            IO.setDefaultHostnameVerifier { _: String?, _: SSLSession? -> true }
             IO.setDefaultSSLContext(sslcontext)
             //set the socket.io url here
-            socket =
-                IO.socket("https://192.168.0.105:3000?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjA1YmJkYTIwZDQzMTAwMTdlYmM5YzMiLCJpYXQiOjE1OTQ3MTIyMTN9.fzzVDGFZzQnHnksYT6OXUWlcTrhi8eWSq_Xrkot0ArU")
+            val token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjA1YmJkYTIwZDQzMTAwMTdlYmM5YzMiLCJpYXQiOjE1OTQ3OTQxMzV9.lCthb4nT4ggg_saeNGu1gUMOtOnEiFBPWrf7Q_kc36k"
+            val tokenYelena = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjA2YjdhZGQ1MjY2MTAwMTcxMTVmZWEiLCJpYXQiOjE1OTQ4MTYwNjJ9.d5qgNrQ-RoRB6vwkQA9maq5bhXJ2mslrcW4VNe2aaDE"
+            socket = IO.socket("https://192.168.0.105:3000?token=$token")
             socket.connect()
             Log.d("SignallingClient", "init() called")
-            if (roomName!!.isNotEmpty()) {
-                emitInitStatement(roomName)
+//
+//              socket.emit("call", "5f05c4851e41d40d29360d08") // Erik
+//            socket.emit("call", "5f05bbda20d4310017ebc9c3") // David
+
+
+
+            socket.on("callAccepted") {
+                Log.d(
+                    "SignallingClient",
+                    "call accepted: args = [" + Arrays.toString(it) + "]"
+                )
+                this.roomName = it[1].toString()
+                callback.onCallAccepted(it[1].toString())
+
             }
-            socket.emit("call", "5f05baa520d4310017ebc9bd")
-            socket.on("callAccepted",
-                Emitter.Listener { args: Array<Any?>? ->
-                    Log.d(
-                        "SignallingClient",
-                        "call accepted: args = [" + Arrays.toString(args) + "]"
-                    )
+
+
+//            room created event.
+            socket.on("call") {
+                Log.d("SignallingClient", "created call() called with: args = [" + Arrays.toString(it) + "]")
+                socket.emit("callAccepted", it[0].toString(), true)
+                isInitiator = false
+//                callback.onCreatedRoom()
+            }
+
+            socket.on("offer") {
+                roomName = it[0].toString()
+                try {
+                    val data = it[1] as JSONObject
+                    callback.onOfferReceived(data)
+                } catch (e: JSONException) {
+                    e.printStackTrace()
                 }
-            )
+                isChannelReady = true
+            }
 
-
-            //room created event.
-//            socket.on("call", args -> {
-//                Log.d("SignallingClient", "created call() called with: args = [" + Arrays.toString(args) + "]");
-//                isInitiator = true;
-//                callback.onCreatedRoom();
-//            });
-
-
-            //room is full event
-            socket.on("full",
-                Emitter.Listener { args: Array<Any?>? ->
-                    Log.d(
-                        "SignallingClient",
-                        "full call() called with: args = [" + Arrays.toString(args) + "]"
-                    )
-                }
-            )
-
-            //peer joined event
-            socket.on("join", Emitter.Listener { args: Array<Any?>? ->
+            socket.on("answer") {
                 Log.d(
                     "SignallingClient",
-                    "join call() called with: args = [" + Arrays.toString(args) + "]"
+                    "answer called with: args = [" + Arrays.toString(it) + "]"
                 )
-                isChannelReady = true
-                callback!!.onNewPeerJoined()
-            })
-
-            //when you joined a chat room successfully
-            socket.on("joined", Emitter.Listener { args: Array<Any?>? ->
-                Log.d(
-                    "SignallingClient",
-                    "joined call() called with: args = [" + Arrays.toString(args) + "]"
-                )
-                isChannelReady = true
-                callback!!.onJoinedRoom()
-            })
-
-            //log event
-            socket.on("log",
-                Emitter.Listener { args: Array<Any?>? ->
-                    Log.d(
-                        "SignallingClient",
-                        "log call() called with: args = [" + Arrays.toString(args) + "]"
-                    )
+                try {
+                    val data = it[0] as JSONObject
+                    callback.onAnswerReceived(data)
+                } catch (e: JSONException) {
+                    e.printStackTrace()
                 }
-            )
+                isChannelReady = true
+            }
 
-            //bye event
-            socket.on("bye",
-                Emitter.Listener { args: Array<Any?> ->
-                    callback!!.onRemoteHangUp(
-                        args[0] as String?
-                    )
+            socket.on("candidates") {
+                try {
+                    val data = it[0] as JSONObject
+                    callback.onIceCandidateReceived(data)
+                } catch (e: JSONException) {
+                    e.printStackTrace()
                 }
-            )
-
+            }
             //messages - SDP and ICE candidates are transferred through this
-            socket.on("message", Emitter.Listener { args: Array<Any> ->
+            socket.on("message") { args: Array<Any> ->
                 Log.d(
                     "SignallingClient",
-                    "message call() called with: args = [" + Arrays.toString(args) + "]"
+                    "message call() called with: args = [" + args.contentToString() + "]"
                 )
                 if (args[0] is String) {
                     Log.d("SignallingClient", "String received :: " + args[0])
                     val data = args[0] as String
                     if (data.equals("got user media", ignoreCase = true)) {
-                        callback!!.onTryToStart()
+                        callback.onTryToStart()
                     }
                     if (data.equals("bye", ignoreCase = true)) {
-                        callback!!.onRemoteHangUp(data)
+                        callback.onRemoteHangUp(data)
                     }
                 } else if (args[0] is JSONObject) {
                     try {
@@ -156,17 +146,17 @@ internal class SignallingClient {
                         )
                         val type = data.getString("type")
                         if (type.equals("offer", ignoreCase = true)) {
-                            callback!!.onOfferReceived(data)
+                            callback.onOfferReceived(data)
                         } else if (type.equals("answer", ignoreCase = true) && isStarted) {
-                            callback!!.onAnswerReceived(data)
+                            callback.onAnswerReceived(data)
                         } else if (type.equals("candidate", ignoreCase = true) && isStarted) {
-                            callback!!.onIceCandidateReceived(data)
+                            callback.onIceCandidateReceived(data)
                         }
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }
                 }
-            })
+            }
         } catch (e: URISyntaxException) {
             e.printStackTrace()
         } catch (e: NoSuchAlgorithmException) {
@@ -176,21 +166,7 @@ internal class SignallingClient {
         }
     }
 
-    private fun emitInitStatement(message: String?) {
-        Log.d(
-            "SignallingClient",
-            "emitInitStatement() called with: event = [create or join], message = [$message]"
-        )
-        socket!!.emit("create or join", message)
-    }
 
-    fun emitMessage(message: String) {
-        Log.d(
-            "SignallingClient",
-            "emitMessage() called with: message = [$message]"
-        )
-        socket!!.emit("call", message)
-    }
 
     fun emitMessage(message: SessionDescription) {
         try {
@@ -202,8 +178,40 @@ internal class SignallingClient {
             obj.put("type", message.type.canonicalForm())
             obj.put("sdp", message.description)
             Log.d("emitMessage", obj.toString())
-            socket!!.emit("message", obj)
+            socket.emit("message", obj)
             Log.d("vivek1794", obj.toString())
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+    }
+
+    fun emitOffer(message: SessionDescription) {
+        try {
+            Log.d(
+                "SignallingClient",
+                "emitOffer() called with: message = [$message]"
+            )
+            val obj = JSONObject()
+            obj.put("sdp", message.description)
+            obj.put("type", message.type.canonicalForm())
+            Log.d("SignallingClient", "emitOffer $obj")
+            socket.emit("offer", roomName, obj)
+        } catch (e: JSONException) {
+            e.printStackTrace()
+        }
+    }
+
+    fun emitAnswer(message: SessionDescription) {
+        try {
+            Log.d(
+                "SignallingClient",
+                "emitOffer() called with: message = [$message]"
+            )
+            val obj = JSONObject()
+            obj.put("sdp", message.description)
+            obj.put("type", message.type.canonicalForm())
+            Log.d("SignallingClient", "emitAnswer $obj")
+            socket.emit("answer", roomName, obj)
         } catch (e: JSONException) {
             e.printStackTrace()
         }
@@ -212,20 +220,30 @@ internal class SignallingClient {
     fun emitIceCandidate(iceCandidate: IceCandidate) {
         try {
             val `object` = JSONObject()
-            `object`.put("type", "candidate")
-            `object`.put("label", iceCandidate.sdpMLineIndex)
-            `object`.put("id", iceCandidate.sdpMid)
+            //`object`.put("type", "candidate")
+            `object`.put("sdpMLineIndex", iceCandidate.sdpMLineIndex)
+            `object`.put("sdpMid", iceCandidate.sdpMid)
             `object`.put("candidate", iceCandidate.sdp)
-            socket!!.emit("message", `object`)
+            socket.emit("candidates", roomName, `object`)
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
     fun close() {
-        socket!!.emit("bye", roomName)
-        socket!!.disconnect()
-        socket!!.close()
+//        socket.emit("bye", roomName)
+        socket.disconnect()
+        socket.close()
+    }
+
+    fun callOpponentYelena() {
+        Log.d("SignallingClient", "call call Yelena")
+        socket.emit("call", "5f06b7add526610017115fea") //Yelena
+    }
+
+    fun callOpponentErik() {
+        Log.d("SignallingClient", "call call Erik")
+        socket.emit("call", "5f05c4851e41d40d29360d08") //Erik
     }
 
     internal interface SignalingInterface {
@@ -233,9 +251,8 @@ internal class SignallingClient {
         fun onOfferReceived(data: JSONObject?)
         fun onAnswerReceived(data: JSONObject?)
         fun onIceCandidateReceived(data: JSONObject?)
+        fun onCallAccepted(room: String?)
         fun onTryToStart()
-        fun onCreatedRoom()
-        fun onJoinedRoom()
         fun onNewPeerJoined()
     }
 
@@ -244,10 +261,6 @@ internal class SignallingClient {
         fun getInstance(): SignallingClient? {
             if (instance == null) {
                 instance = SignallingClient()
-            }
-            if (instance!!.roomName == null) {
-                //set the room name here
-                instance!!.roomName = "vivek17"
             }
             return instance
         }
